@@ -21,6 +21,17 @@ void initialize_sudoku(struct sudoku *p)
 
 	int n;
 
+	for (n = 0; n < 9; n++) {
+		p->rows[n].type = ROW;
+		p->rows[n].grp_index = n;
+
+		p->cols[n].type = COL;
+		p->cols[n].grp_index = n;
+
+		p->blks[n].type = BLK;
+		p->blks[n].grp_index = n;
+	}
+
 	for (n = 0; n < 81; n++) {
 		r = n / 9;
 		c = n % 9;
@@ -49,6 +60,9 @@ void update_node_with_value(struct sudoku *p, struct node *node, int val)
 		node->options = OPTION(val);
 		node->numoptions = 1;
 		node->changed = 3;
+		node->grps[0]->value_flag |= node->options;
+		node->grps[1]->value_flag |= node->options;
+		node->grps[2]->value_flag |= node->options;
 		p->nodes_left--;
 		p->nodes_changed++;
 	} else {
@@ -77,6 +91,7 @@ void print_grp(struct nodegrp *grp)
 {
 	int j;
 
+	printf("%s(%d): ", grp_types[grp->type], grp->grp_index);
 	for (j = 0; j < 9; j++)
 		printf("%3x ", grp->members[j]->options);
 	printf("\n");
@@ -123,14 +138,15 @@ int check_grp_sanity(struct nodegrp *grp)
 {
 	int i;
 	int val;
+	unsigned int value_flag = 0;
 
 	for (i = 0; i < 9; i++) {
 		val = grp->members[i]->value;
 		if (val) {
-			if (grp->value_flag & OPTION(val))
+			if (value_flag & OPTION(val))
 				return -1;
 			else
-				grp->value_flag |= OPTION(val);
+				value_flag |= OPTION(val);
 		}
 	}
 	return 0;
@@ -240,8 +256,6 @@ void scan_grp(struct sudoku *p, struct nodegrp *grp)
 		val = grp->members[n]->value;
 
 		update_grp_only_value(p, grp, val);
-
-		update_grp_only_node(p, grp);
 	}
 }
 
@@ -277,12 +291,12 @@ int main(void)
 			if (p->nodes[n].changed)
 				scan_grps(p, p->nodes[n].grps, n);
 		}
+
 		for (n = 0; n < 9; n++) {
 			update_grp_only_node(p, p->rows + n);
 			update_grp_only_node(p, p->cols + n);
 			update_grp_only_node(p, p->blks + n);
 		}
-		break;
 	};
 	printf("Nodes changed = %d, left = %d\n", p->nodes_changed,
 							p->nodes_left);

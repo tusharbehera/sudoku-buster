@@ -1,4 +1,11 @@
 
+enum GRP_TYPE {
+	ROW,
+	COL,
+	BLK
+};
+
+const char *grp_types[] = { "Row", "Col", "Blk" };
 
 struct node {
 	unsigned int value;
@@ -12,6 +19,8 @@ struct nodegrp {
 	struct node *members[9];
 	unsigned int indices[9];
 	unsigned int value_flag;
+	enum GRP_TYPE type;
+	int grp_index;
 };
 
 struct sudoku {
