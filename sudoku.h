@@ -21,6 +21,7 @@ struct nodegrp {
 	unsigned int value_flag;
 	enum GRP_TYPE type;
 	int grp_index;
+	int need_update;
 };
 
 struct sudoku {
