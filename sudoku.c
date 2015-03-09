@@ -73,6 +73,16 @@ void read_sudoku(struct sudoku *p)
 	}
 }
 
+void print_grp(struct nodegrp *grp)
+{
+	int j;
+
+	for (j = 0; j < 9; j++)
+		printf("%3x ", grp->members[j]->options);
+	printf("\n");
+
+}
+
 void print_sudoku(struct sudoku *p)
 {
 	int i, j, n;
@@ -168,8 +178,8 @@ void update_grp_only_value(struct sudoku *p, struct nodegrp *grp, int val)
 		if (node->numoptions == 1) {
 			node->value = get_value(node->options);
 			p->nodes_left--;
-			printf("(1)(%2d) val (%d), options(%3x)\n",
-					grp->indices[m],
+			printf("(1)(%2d/%d) val (%d), options(%3x)\n",
+					grp->indices[m], m,
 					node->value,
 					node->options);
 			node->changed = 3;
@@ -202,11 +212,13 @@ void update_grp_only_node(struct sudoku *p, struct nodegrp *grp)
 		}
 		if (valopt == 1) {
 			node = grp->members[val_index];
+			print_grp(grp);
 			update_node_with_value(p, grp->members[val_index], val);
-			printf("(2)(%2d) val (%d), options(%3x)\n",
-					grp->indices[val_index],
+			printf("(2)(%2d/%d) val (%d), options(%3x)\n",
+					grp->indices[val_index], val_index,
 					node->value,
 					node->options);
+			print_grp(grp);
 		}
 	}
 }
@@ -265,6 +277,12 @@ int main(void)
 			if (p->nodes[n].changed)
 				scan_grps(p, p->nodes[n].grps, n);
 		}
+		for (n = 0; n < 9; n++) {
+			update_grp_only_node(p, p->rows + n);
+			update_grp_only_node(p, p->cols + n);
+			update_grp_only_node(p, p->blks + n);
+		}
+		break;
 	};
 	printf("Nodes changed = %d, left = %d\n", p->nodes_changed,
 							p->nodes_left);
