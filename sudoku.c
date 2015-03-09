@@ -116,20 +116,19 @@ int check_grp_sanity(struct nodegrp *grp)
 
 	for (i = 0; i < 9; i++) {
 		val = grp->members[i]->value;
-		if (val)
+		if (val) {
 			if (grp->value_flag & OPTION(val))
 				return -1;
 			else
 				grp->value_flag |= OPTION(val);
+		}
 	}
 	return 0;
 }
 
 int check_data_sanity(struct sudoku *p)
 {
-	struct nodegrp *grp;
-	int i, n;
-	int val;
+	int n;
 
 	for (n = 0; n < 9; n++) {
 		if (check_grp_sanity(&p->rows[n])) {
@@ -147,6 +146,8 @@ int check_data_sanity(struct sudoku *p)
 			return -1;
 		}
 	}
+
+	return 0;
 }
 
 void update_grp_only_value(struct sudoku *p, struct nodegrp *grp, int val)
@@ -212,10 +213,8 @@ void update_grp_only_node(struct sudoku *p, struct nodegrp *grp)
 
 void scan_grp(struct sudoku *p, struct nodegrp *grp)
 {
-	int n, m;
+	int n;
 	int val;
-	int options;
-	struct node *node;
 
 	for (n = 0; n < 9; n++) {
 		if (grp->members[n]->changed == 0)
@@ -244,10 +243,8 @@ void scan_grps(struct sudoku *p, struct nodegrp **grps, int index)
 
 int main(void)
 {
-	struct sudoku sudoku_data;
 	struct sudoku *p;
 	int n;
-	int opt = 2;
 
 	p = (struct sudoku *) malloc(sizeof(struct sudoku));
 	if (!p) {
@@ -272,4 +269,6 @@ int main(void)
 	printf("Nodes changed = %d, left = %d\n", p->nodes_changed,
 							p->nodes_left);
 	print_sudoku(p);
+
+	return 0;
 }

@@ -6,6 +6,7 @@
 CC=$(CROSS)gcc
 
 CFLAGS=-g -I.
+CFLAGS+=-Wall
 
 LFLAGS= -L.
 LFLAGS+=-static
