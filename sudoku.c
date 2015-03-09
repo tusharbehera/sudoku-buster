@@ -188,10 +188,10 @@ void update_grp_only_node(struct sudoku *p, struct nodegrp *grp)
 	/* Find if a number is possible at a particular node */
 	for (val = 1; val <= 9; val++) {
 		valopt = 0;
+		if (grp->value_flag & OPTION(val))
+			continue;
 		for (n = 0; n < 9; n++) {
 			node = grp->members[n];
-			if (node->value)
-				continue;
 			if (node->options & OPTION(val)) {
 				if (valopt++)
 					break;
